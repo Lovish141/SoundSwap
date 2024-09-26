@@ -23,7 +23,11 @@ app.use('/api/auth',authRoutes);
 app.use('/api/playlist',playlistRoutes);
 app.use('/api/session',sessionRoutes);
 
-
+app.get("/demoEndpoint",(req,res)=>{
+    return res.json({
+        message:"Sent!"
+    })
+})
 
 const PORT=process.env.PORT
 
