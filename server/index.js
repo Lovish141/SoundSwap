@@ -28,14 +28,14 @@ app.get("/demoEndpoint",(req,res)=>{
         message:"Sent!"
     })
 })
-
+mongoose.connect(process.env.MONGO_CONNECTION_URI)
+.then(() => console.log('MongoDB connected'))
+.catch((err) => console.log(err));
 const PORT=process.env.PORT
 
 app.listen(PORT,()=>{
     try{
-        mongoose.connect(process.env.MONGO_CONNECTION_URI)
-    .then(() => console.log('MongoDB connected'))
-    .catch((err) => console.log(err));
+    
     console.log(`Server is connected at port`+PORT);
     }catch(error){
         console.log(error);
