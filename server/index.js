@@ -13,9 +13,9 @@ const app=express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/auth',authRoutes);
-app.use('/playlist',playlistRoutes);
-app.use('/session',sessionRoutes);
+app.use('/api/auth',authRoutes);
+app.use('/api/playlist',playlistRoutes);
+app.use('/api/session',sessionRoutes);
 
 
 
