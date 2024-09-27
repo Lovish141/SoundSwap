@@ -5,14 +5,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Music, User, LayoutDashboard, LogOut } from "lucide-react"; // Importing icons from Lucide, which is commonly used with ShadCN
 import { Button } from "@/components/ui/button";
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Assuming a state for login
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const navigate=useNavigate();
   const logOut = () => {
     localStorage.removeItem("soundSwapUser");
     setIsLoggedIn(false);
+    navigate("/");
   };
   useEffect(() => {
     const userData = localStorage.getItem("soundSwapUser");

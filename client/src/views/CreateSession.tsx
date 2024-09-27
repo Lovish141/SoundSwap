@@ -113,7 +113,7 @@ const CreateSession: React.FC  = () => {
               <Button 
                 onClick={handleCreateSession} 
                 className="w-full bg-purple-600 text-white hover:bg-purple-700"
-                disabled={isLoading || !spotifyLink || !sessionName}
+                disabled={isLoading || !spotifyLink || !sessionName || !playListTitle || !playListDesc}
               >
                 {isLoading ? 'Creating Session...' : 'Create Session and Convert'}
               </Button>

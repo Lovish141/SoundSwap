@@ -1,15 +1,17 @@
 import React, { useEffect,useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent,  CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {  Plus, History } from 'lucide-react';
+import {  Plus, History, AlertCircle } from 'lucide-react';
 import { getAllSessions } from '@/services/DataService';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Dashboard: React.FC  = () => {
     const navigate=useNavigate();
     const [sessions,setSessions]=useState([]);
     const [newSessionName, setNewSessionName] = useState("");
+    const [isAuth,setIsAuth]=useState(false);
     useEffect(() => {
 
 
@@ -18,8 +20,10 @@ const Dashboard: React.FC  = () => {
         navigate('/signIn')
       }
       if (userData) {
-        const userDataJson = JSON.parse(userData);  // Safe to parse when it's not null
-        console.log(userDataJson);  // Now you can work with the parsed data
+        const userDataJson = JSON.parse(userData);
+        if(userDataJson.isSpotifyAuth && userDataJson.isYoutubeAuth){
+          setIsAuth(true);
+        }
         getAllSessions(userDataJson.token)
         .then((data)=>{
           setSessions(data);
@@ -64,10 +68,22 @@ const Dashboard: React.FC  = () => {
                 onChange={(e) => setNewSessionName(e.target.value)}
                 className="mr-4 flex-grow"
               />
-              <Button onClick={handleCreateSession} disabled={newSessionName.length==0} className="bg-purple-600 text-white hover:bg-purple-700">
+              <Button onClick={handleCreateSession} disabled={newSessionName.length==0 || isAuth == false} className="bg-purple-600 text-white hover:bg-purple-700">
                 Create Session
               </Button>
             </CardContent>
+            {!isAuth &&
+              (
+                <CardContent>
+                <Alert variant={"destructive"}>
+                  <AlertDescription className='flex items-center align-middle'>
+                  <AlertCircle className='w-4 h-4'/>
+                  <span className='ml-2'>Head to the <Link to={"/profile"} className='underline underline-offset-2'>Profile</Link> section to complete authorizations.
+                  </span>
+                  </AlertDescription>
+                </Alert>
+                </CardContent>
+              )}
           </Card>
           
           {/* Session History */}

@@ -13,11 +13,16 @@ import { Label } from "@/components/ui/label"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { invokeSignIn } from "@/services/DataService"
+import Loader from "@/components/global/Loader"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 
 export function SignIn()  {
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("");
+    const [loading,setLoading]=useState(false);
+    const [err,setErr]=useState();
     const navigate=useNavigate();
     useEffect(()=>{
       const userData : string | null= localStorage.getItem("soundSwapUser");
@@ -29,6 +34,7 @@ export function SignIn()  {
       }
     },[])
     const handleSubmit=(e:any)=>{
+      setLoading(true);
         e.preventDefault();
         invokeSignIn(email,password)
         .then((data)=>{
@@ -37,13 +43,28 @@ export function SignIn()  {
           navigate('/dashboard');
         })
         .catch((err)=>{
-          console.log(err.response.data.message);
+          setErr(err.response.data.message);
+        })
+        .finally(()=>{
+          setLoading(false);
         });
     }
   return (
     <div className="flex items-center justify-center h-screen">
+      {
+        loading &&
+        <Card className="max-w-sm mx-auto">
+          <CardContent>
+            <Loader/>
+          </CardContent>
+        </Card>
+      }
+      {
+        !loading &&
+      
     <Card className="mx-auto max-w-sm ">
       <CardHeader>
+        
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>
           Enter your email below to login to your account
@@ -90,8 +111,18 @@ export function SignIn()  {
             Sign up
           </Link>
         </div>
+        {
+          err &&
+          (
+           <Alert variant="destructive" className="mt-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle><AlertDescription>{err}</AlertDescription>
+            </Alert>
+          )
+        }
       </CardContent>
     </Card>
+}
     </div>
   )
 }

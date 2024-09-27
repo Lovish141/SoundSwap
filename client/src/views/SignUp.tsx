@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router-dom"
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -12,6 +11,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useEffect, useState } from "react"
 import { invokeSignUp } from "@/services/DataService"
+import Loader from "@/components/global/Loader"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 
 
@@ -20,6 +22,8 @@ export function SignUp() {
     const [lastName,setLastName]=useState("")
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("")
+    const [loading,setLoading]=useState(false);
+    const [err,setErr]=useState();
     const navigate=useNavigate();
     useEffect(()=>{
       const userData : string | null= localStorage.getItem("soundSwapUser");
@@ -30,20 +34,33 @@ export function SignUp() {
     },[])
 
     const handleSubmit=(e:any)=>{
-      e.preventDefault();
+      setLoading(true);
+         e.preventDefault();
         invokeSignUp(firstName,lastName,email,password)
         .then((data)=>{
           const {message,...modifiedData}=data;
-
           localStorage.setItem('soundSwapUser',JSON.stringify(modifiedData));
+          navigate("/dashboard");
         })
         .catch((err)=>{
-          console.log(err);
+          setErr(err.message);
+        })
+        .finally(()=>{
+          setLoading(false);
         })
     }
 
   return (
     <div className="flex items-center justify-center h-screen">
+       { loading &&
+        <Card className="mx-auto max-w-sm">
+        <CardContent>
+         <Loader/>
+        </CardContent>
+      </Card>
+      }
+
+     {!loading &&
     <Card className="mx-auto max-w-sm">
       <CardHeader>
         <CardTitle className="text-xl">Sign Up</CardTitle>
@@ -93,8 +110,19 @@ export function SignUp() {
             Sign in
           </Link>
         </div>
+
+        {
+          err &&
+          (
+           <Alert variant="destructive" className="mt-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle><AlertDescription>{err}</AlertDescription>
+            </Alert>
+          )
+        }
       </CardContent>
     </Card>
+}
     </div>
   )
 }
