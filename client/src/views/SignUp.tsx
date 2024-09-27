@@ -53,11 +53,9 @@ export function SignUp() {
   return (
     <div className="flex items-center justify-center h-screen">
        { loading &&
-        <Card className="mx-auto max-w-sm">
-        <CardContent>
+       
          <Loader/>
-        </CardContent>
-      </Card>
+        
       }
 
      {!loading &&
