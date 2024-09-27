@@ -95,6 +95,14 @@ const Dashboard: React.FC  = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {sessions.length==0 &&
+              (
+                <Card>
+                  <CardHeader>
+                    No Session History
+                  </CardHeader>
+                </Card>
+              )}
               <div className="space-y-4">
                 {sessions.map((session:any) => (
                   <Card key={session._id} className="bg-white shadow hover:shadow-md transition-shadow duration-300">
