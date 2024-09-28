@@ -38,7 +38,7 @@ const userSchema=new mongoose.Schema({
         required:false
     },
     youtubeTokenExpiry:{
-        type:String,
+        type:Date,
         required:false
     },
     spotifyAccessToken:{
@@ -50,7 +50,7 @@ const userSchema=new mongoose.Schema({
         required:false
     },
     spotifyTokenExpiry:{
-        type:String,
+        type:Date,
         required:false
     }
 })
