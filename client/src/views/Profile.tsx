@@ -40,9 +40,11 @@ const ProfilePage: React.FC  = () => {
     .then((data)=>{
       window.location.href = data.redirectUrl;
     })
-    .catch((error)=>{console.log(error)});
-
+    .catch((error)=>{
     setIsSpotifyConnected(true);
+      console.log(error)}
+    );
+
   };
 
   const handleYouTubeAuth = () => {
@@ -51,9 +53,11 @@ const ProfilePage: React.FC  = () => {
     .then((data)=>{
       window.location.href = data.redirectUrl;
     })
-    .catch((error)=>{console.log(error)});
-
+    .catch((error)=>{
     setIsYouTubeConnected(true);
+      console.log(error)
+    });
+
   };
 
   return (

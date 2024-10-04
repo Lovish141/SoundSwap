@@ -118,7 +118,6 @@ const fetchYoutubeAccessToken=async(userId)=>{
     authController.youtubeOAuth2Client.setCredentials({
     access_token: user.youtubeAccessToken,
     refresh_token: user.youtubeRefreshToken,
-    expiry_date: user.youtubeTokenExpiry
     })
     const { access_token, expiry_date  } = await authController.youtubeOAuth2Client.refreshAccessToken();
     user.youtubeAccessToken=access_token;

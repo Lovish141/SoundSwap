@@ -71,6 +71,7 @@ const youtubeLogin = (req, res) => {
     const url = youtubeOAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: scopes,
+        prompt: 'consent'
     });
     
     res.json({redirectUrl:url});
