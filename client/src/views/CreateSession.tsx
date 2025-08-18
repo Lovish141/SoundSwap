@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { AlertCircle, CheckCircle2, Music, Youtube, Info, Sparkles, ExternalLink, Clock } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { convertPlayList, createSession } from '@/services/DataService';
-import Loader from '@/components/global/Loader';
 
 const CreateSession: React.FC = () => {
   const navigate = useNavigate();
