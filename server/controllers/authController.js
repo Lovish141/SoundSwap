@@ -35,6 +35,10 @@ const spotifyLogin=(req,res)=>{
 const spotifyCallback=async(req,res)=>{
     const code=req.query.code || null;
 
+    if(!code) {
+        return res.status(400).json({error: 'Authorization code is required'});
+    }
+
     try{
         const tokenResponse = await axios.post('https://accounts.spotify.com/api/token', querystring.stringify({
             code: code,
@@ -47,31 +51,43 @@ const spotifyCallback=async(req,res)=>{
             },
         });
 
-        const { access_token, refresh_token,expires_in } = tokenResponse.data;
+        const { access_token, refresh_token, expires_in } = tokenResponse.data;
+        
+        if(!access_token || !refresh_token) {
+            throw new Error('Invalid token response from Spotify');
+        }
+
         const user = await User.findOneAndUpdate({ _id: req.id }, {
-            isSpotifyAuth:true,
+            isSpotifyAuth: true,
             spotifyAccessToken: access_token,
             spotifyRefreshToken: refresh_token,
-            spotifyTokenExpiry:Date.now() + 3600*1000
-        }, { upsert: true });
-        console.log(tokenResponse.data);
-        res.json({ access_token, refresh_token });
+            spotifyTokenExpiry: Date.now() + (expires_in * 1000) // Convert seconds to milliseconds
+        }, { upsert: true, new: true });
+
+        console.log('Spotify tokens saved successfully for user:', req.id);
+        res.json({ 
+            access_token, 
+            refresh_token,
+            expires_in,
+            message: 'Spotify authentication successful'
+        });
     }catch(error)
     {
-        console.error("Error fetching spotify tokens",error);
-        res.status(500).json({error:'Failed to authenticate with Spotify'});
+        console.error("Error fetching spotify tokens",error.response?.data || error.message);
+        res.status(500).json({error:'Failed to authenticate with Spotify', details: error.message});
     }
 }
 
 const youtubeLogin = (req, res) => {
     const scopes = [
-        'https://www.googleapis.com/auth/youtube',
+        'https://www.googleapis.com/auth/youtube'
     ];
     
     const url = youtubeOAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: scopes,
-        prompt: 'consent'
+        prompt: 'consent',
+        include_granted_scopes: true
     });
     
     res.json({redirectUrl:url});
@@ -80,21 +96,41 @@ const youtubeLogin = (req, res) => {
 const youtubeCallback = async (req, res) => {
     const code = req.query.code || null;
 
+    if(!code) {
+        return res.status(400).json({error: 'Authorization code is required'});
+    }
+
     try {
         const { tokens } = await youtubeOAuth2Client.getToken(code);
+        
+        if(!tokens.access_token || !tokens.refresh_token) {
+            throw new Error('Invalid token response from YouTube');
+        }
+
+        // Calculate proper expiry time from token response
+        const expiryTime = tokens.expiry_date || (Date.now() + 3600*1000);
+
         const user = await User.findOneAndUpdate({ _id: req.id }, {
-            isYoutubeAuth:true,
+            isYoutubeAuth: true,
             youtubeAccessToken: tokens.access_token,
             youtubeRefreshToken: tokens.refresh_token,
-            youtubeTokenExpiry:Date.now() +3600*1000
-        }, { upsert: true });
+            youtubeTokenExpiry: expiryTime
+        }, { upsert: true, new: true });
 
-        
-        res.json(tokens);
+        console.log('YouTube tokens saved successfully for user:', req.id);
+        res.json({
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token,
+            expires_in: tokens.expiry_date ? Math.floor((tokens.expiry_date - Date.now()) / 1000) : 3600,
+            message: 'YouTube authentication successful'
+        });
 
     } catch (error) {
-        console.error('Error fetching YouTube tokens:', error);
-        res.status(500).json({ error: 'Failed to authenticate with YouTube' });
+        console.error('Error fetching YouTube tokens:', error.response?.data || error.message);
+        res.status(500).json({ 
+            error: 'Failed to authenticate with YouTube',
+            details: error.message 
+        });
     }
 };
 

@@ -12,7 +12,7 @@ const app=express();
 
 app.use(cors(
     {
-        origin: 'https://sound-swap-frontend.vercel.app', // Allow requests from this origin
+        origin: process.env.CORS_ALLOWED_ORIGINS, // Allow requests from this origin
         methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed HTTP methods
         allowedHeaders: ['Content-Type', 'Authorization'], // Specify allowed headers
       }

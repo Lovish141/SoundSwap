@@ -16,23 +16,40 @@ const ProfilePage: React.FC  = () => {
   const [isSpotifyConnected, setIsSpotifyConnected] = useState(false);
   const [isYouTubeConnected, setIsYouTubeConnected] = useState(false);
 
-  useEffect(()=>{
-    const userData : string | null= localStorage.getItem("soundSwapUser");
+  useEffect(() => {
+    let isMounted = true;
+
+    const initializeProfile = () => {
+      const userData: string | null = localStorage.getItem("soundSwapUser");
+      
       if (!userData) {
-        navigate('/signIn')
+        if (isMounted) {
+          navigate('/signIn');
+        }
+        return;
       }
-      if (userData) {
-        const userDataJson = JSON.parse(userData);  // Safe to parse when it's not null
-        setUserFirstName(userDataJson.firstName);
-        setUserLastName(userDataJson.lastName);
-        setUserEmail(userDataJson.email);
-        setIsSpotifyConnected(userDataJson.isSpotifyAuth)
-        setIsYouTubeConnected(userDataJson.isYoutubeAuth)
-      } else {
-        console.log("No user data found in localStorage");
-        navigate("/signIn");
+
+      if (isMounted) {
+        try {
+          const userDataJson = JSON.parse(userData);
+          setUserFirstName(userDataJson.firstName);
+          setUserLastName(userDataJson.lastName);
+          setUserEmail(userDataJson.email);
+          setIsSpotifyConnected(userDataJson.isSpotifyAuth);
+          setIsYouTubeConnected(userDataJson.isYoutubeAuth);
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+          navigate("/signIn");
+        }
       }
-  },[]);
+    };
+
+    initializeProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate]);
 
   const handleSpotifyAuth = () => {
     // Implement Spotify authentication logic here
@@ -41,8 +58,8 @@ const ProfilePage: React.FC  = () => {
       window.location.href = data.redirectUrl;
     })
     .catch((error)=>{
-    setIsSpotifyConnected(true);
-      console.log(error)}
+      console.log(error)
+    }
     );
 
   };
@@ -54,7 +71,6 @@ const ProfilePage: React.FC  = () => {
       window.location.href = data.redirectUrl;
     })
     .catch((error)=>{
-    setIsYouTubeConnected(true);
       console.log(error)
     });
 
